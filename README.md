@@ -6,12 +6,12 @@ Rich link previews with Instant View for Telegram, for Facebook, Instagram, Redd
 Named after [Homura Akemi](https://madoka.fandom.com/wiki/Homura_Akemi), of *Puella Magi Madoka
 Magica*.
 
-- **bot**: replies in allowed chats with the same links on another host (`facebook.com`,
-  `instagram.com`, `reddit.com` and `threads.com` → your preview hosts, `x.com` → `fixupx.com`,
-  ...).
 - **server**: serves the preview host. Telegram gets preview tags and an Instant View page for
   the post, and Discord the same card; everyone else is redirected to the original. A dashboard
   on a second port holds the settings and statistics.
+- **bot** (optional): replies in allowed chats with the same links on another host
+  (`facebook.com`, `instagram.com`, `reddit.com` and `threads.com` → your preview hosts, `x.com`
+  → `fixupx.com`, ...).
 
 ## Setup
 
@@ -26,7 +26,7 @@ Needs Docker Compose (or `podman compose`), a Telegram bot token, and an HTTPS f
    cp bot/bot.example.toml bot.toml   # your preview hosts are the values for "facebook.com", "instagram.com", "reddit.com" and "threads.com"
    ```
 
-3. Start: `docker compose up -d --build`
+3. Start: `docker compose up -d` (pulls the images from GHCR; `--build` builds from source)
 4. Route your front end:
    - each site's preview host → `127.0.0.1:8080` (`PUBLIC_ADDR`), with `FACEBOOK_HOST`,
      `INSTAGRAM_HOST`, `REDDIT_HOST` and `THREADS_HOST` set to their names

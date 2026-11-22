@@ -1,6 +1,7 @@
 # Bot
 
-In an allowed chat, the bot replies to a message with its links, domains swapped. Nothing else.
+Optional: the server doesn't need it. In an allowed chat, the bot replies to a message with its
+links, domains swapped. Nothing else.
 
 ## Messages
 

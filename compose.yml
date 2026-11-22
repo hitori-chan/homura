@@ -1,18 +1,8 @@
+# `up -d` pulls the published images, `up -d --build` builds them from this checkout. The bot is
+# optional: remove its service to run without it.
 services:
-  bot:
-    build:
-      context: .
-      target: bot
-    restart: unless-stopped
-    # Only what the bot reads, so the bucket's keys stay with the server.
-    environment:
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?set TELEGRAM_BOT_TOKEN in .env}
-      RUST_LOG: ${RUST_LOG:-info}
-    volumes:
-      - ./bot.toml:/bot.toml:ro
-      - bot-data:/data
-
   homura:
+    image: ghcr.io/hitori-chan/homura:latest
     build:
       context: .
       target: server
@@ -29,6 +19,20 @@ services:
       timeout: 5s
       start_period: 10s
 
+  bot:
+    image: ghcr.io/hitori-chan/homura-bot:latest
+    build:
+      context: .
+      target: bot
+    restart: unless-stopped
+    # Only what the bot reads, so the bucket's keys stay with the server.
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?set TELEGRAM_BOT_TOKEN in .env}
+      RUST_LOG: ${RUST_LOG:-info}
+    volumes:
+      - ./bot.toml:/bot.toml:ro
+      - bot-data:/data
+
 volumes:
-  bot-data:
   homura-data:
+  bot-data:

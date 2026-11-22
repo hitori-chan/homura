@@ -2,14 +2,19 @@
 
 ## Services
 
-`compose.yml` runs two containers, built from the one `Dockerfile` (static binaries in `scratch`
-images). Both read `.env`, but the bot's container gets only `TELEGRAM_BOT_TOKEN` and `RUST_LOG`,
+`compose.yml` runs two containers from the images CI publishes for amd64 and arm64: the server
+(`ghcr.io/hitori-chan/homura`) and the optional bot (`ghcr.io/hitori-chan/homura-bot`), static
+binaries in `scratch` images from the one `Dockerfile`. `--build` builds them from the checkout
+instead. Both read `.env`, but the bot's container gets only `TELEGRAM_BOT_TOKEN` and `RUST_LOG`,
 so the bucket's keys stay with the server.
+
+Tags: `latest` follows `main`, `sha-<commit>` is one build, and a `v1.2.3` tag publishes `1.2.3`
+and `1.2`.
 
 | Service | Network | Data |
 |---|---|---|
-| `bot` | default, outbound only | `bot.toml` (read-only), volume `bot-data` (`state.json`) |
 | `homura` | host, so it can reach a local proxy such as WARP | volume `homura-data` (`server.db`) |
+| `bot` | default, outbound only | `bot.toml` (read-only), volume `bot-data` (`state.json`) |
 
 The sample `.env` keeps the listeners on `127.0.0.1:8080` (public) and `127.0.0.1:8081`
 (dashboard), as `compose.yml` uses the host's network. The server doesn't do TLS; put a front end
@@ -74,14 +79,17 @@ video does.
 
 1. In BotFather, turn off group privacy, so the bot sees ordinary group messages.
 2. Fill in `.env` and `bot.toml` ([configuration](configuration.md)).
-3. `docker compose up -d --build`
+3. `docker compose up -d`
 4. Open the setup link from `docker compose logs homura` within 30 minutes, and set a password or
    add a passkey. `server setup-link` prints a new one.
 
 ## Upgrades and backups
 
-- Upgrade: pull, then run step 3 again. Builds keep compiled crates in a cache, so only what
-  changed compiles again; `docker builder prune` (or `podman image prune --build-cache`) clears it.
+- Upgrade: `git pull`, `docker compose pull`, then `docker compose up -d --force-recreate`
+  (podman-compose keeps the old containers without it).
+- From source: `git pull`, then `docker compose up -d --build`. Builds keep compiled crates in a
+  cache, so only what changed compiles again; `docker builder prune` (or
+  `podman image prune --build-cache`) clears it.
 - Back up the `homura-data` volume (settings, cookies, sign-in, statistics) and `bot-data` (people
   and groups added from the menu).
 - Locked out: `docker compose exec homura /server reset-login` removes the password,

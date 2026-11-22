@@ -8,16 +8,16 @@ how to deploy it.
 Homura: Telegram link previews and Instant View for social posts, from Facebook, Instagram,
 Reddit and Threads. Each site is an `extract::Source`, with its own
 extractor, settings, cookies, budget, statistics and prefix in the video bucket. Two independent
-programs in one Cargo workspace (Rust 1.100, edition 2024):
+programs in one Cargo workspace (Rust 1.100, edition 2024), each with its own image:
 
-- **`bot/`** replies in allowed Telegram chats with the same links on another host
-  (`facebook.com` → the preview host, `x.com` → `fixupx.com`...). Configured by `bot.toml`.
-- **`server/`** answers on the preview hosts, one per site (`FACEBOOK_HOST`, `INSTAGRAM_HOST`,
-  `REDDIT_HOST`, `THREADS_HOST`).
+- **`server/`** is Homura. It answers on the preview hosts, one per site (`FACEBOOK_HOST`,
+  `INSTAGRAM_HOST`, `REDDIT_HOST`, `THREADS_HOST`).
   Telegram's link-preview fetcher, recognized by its user agent *and* Telegram's IP ranges, gets
   preview tags and an Instant View article built from the post; Discord's, by its user agent, the
   same card within a share of the budget; everyone else is redirected to the original. A
   dashboard on a second listener holds the settings, statistics and a playground.
+- **`bot/`**, optional, replies in allowed Telegram chats with the same links on another host
+  (`facebook.com` → the preview host, `x.com` → `fixupx.com`...). Configured by `bot.toml`.
 
 ## Server layout
 
@@ -45,9 +45,9 @@ cargo nextest run --workspace --locked
 cargo deny check
 ```
 
-All four must pass; CI runs exactly these. Running the server, extracting a link and recording
-a fixture are in `docs/development.md`. `cargo insta review` accepts changed snapshots after
-you've read the diff.
+All four must pass; CI runs exactly these, then publishes the images to GHCR on `main` and `v*`
+tags. Running the server, extracting a link and recording a fixture are in `docs/development.md`.
+`cargo insta review` accepts changed snapshots after you've read the diff.
 
 ## Conventions
 
